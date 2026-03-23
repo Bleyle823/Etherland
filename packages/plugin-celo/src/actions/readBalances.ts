@@ -14,12 +14,16 @@ import { celo } from "viem/chains";
 
 const balanceSchema = z.object({
   walletAddress: z.string().optional().describe('The wallet address to check balances for (optional)'),
+  network: z.enum(['celo', 'base']).default('celo').describe('The network to check balances on (celo or base)'),
 });
 
 const extractionTemplate = `
-Extract the wallet address from the message to check Celo balances.
-If the user is asking about their own balance or 'my' balance without providing an address, RETURN AN EMPTY STRING OR UNDEFINED.
-Return only a JSON object with a "walletAddress" property.
+Extract the wallet address and network from the message to check balances.
+If the user mentions "Base", use network "base". 
+If the user mentions "Celo", use network "celo".
+Default to "celo" if no network is mentioned.
+If the user is asking about their own balance or 'my' balance without providing an address, RETURN AN EMPTY STRING OR UNDEFINED for walletAddress.
+Return only a JSON object with properties "walletAddress" and "network".
 Message: {{message.content.text}}
 `;
 
@@ -36,7 +40,7 @@ const ERC20_ABI = [
 export const readBalancesAction: Action = {
   name: 'READ_BALANCES',
   similes: ['CHECK_CELO_BALANCE', 'GET_BALANCES'],
-  description: 'Reads CELO native balance and stablecoin balances (USDC, USDT, USDm) on Celo network.',
+  description: 'Reads CELO native balance and stablecoin balances (USDC, USDT, cUSD) on Celo network.',
   validate: async () => true,
   handler: async (
     runtime: IAgentRuntime,
@@ -55,7 +59,8 @@ export const readBalancesAction: Action = {
         schema: balanceSchema,
       });
 
-      let { walletAddress } = result.object as any;
+      let network = (result.object as any).network || 'celo';
+      let walletAddress = (result.object as any).walletAddress;
 
       if (!walletAddress || !isAddress(walletAddress)) {
         // Fallback to agent's own address if none found in message or invalid address extracted
@@ -74,31 +79,41 @@ export const readBalancesAction: Action = {
         }
       }
 
+      const isBase = network.toLowerCase() === 'base';
+      const rpcUrl = isBase ? "https://mainnet.base.org" : "https://forno.celo.org";
+      const chain = isBase ? { id: 8453, name: 'Base' } : celo;
+
       const publicClient = createPublicClient({
-        chain: celo,
-        transport: http("https://forno.celo.org"),
+        chain: chain as any,
+        transport: http(rpcUrl),
       });
 
-      const [celoBalance, usdcBalance, usdmBalance] = await Promise.all([
+      const usdcAddress = isBase ? "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" : "0xcebA9300f2b948710d2653dD7B07f33A8B32118C";
+      const stableSymbol = isBase ? "USDC" : "cUSD";
+      const stableAddress = isBase ? "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" : "0x765de816845861e75a25fca122bb6898b8b1282a";
+      const nativeSymbol = isBase ? "ETH" : "CELO";
+
+      const [nativeBalance, usdcBalance, stableBalance] = await Promise.all([
         publicClient.getBalance({ address: walletAddress as `0x${string}` }),
         publicClient.readContract({
-          address: "0xcebA9300f2b948710d2653dD7B07f33A8B32118C", // USDC
+          address: usdcAddress as `0x${string}`, // USDC
           abi: ERC20_ABI,
           functionName: "balanceOf",
           args: [walletAddress as `0x${string}`],
         } as any).catch(() => 0n),
         publicClient.readContract({
-          address: "0x765de816845861e75a25fca122bb6898b8b1282a", // USDm
+          address: stableAddress as `0x${string}`, // cUSD or another USDC copy if we wanted, but let's just use the main one
           abi: ERC20_ABI,
           functionName: "balanceOf",
           args: [walletAddress as `0x${string}`],
         } as any).catch(() => 0n)
       ]);
       
-      const replyText = `Balances on Celo for ${walletAddress}:
-- Native CELO: ${formatEther(celoBalance)}
+      const networkName = isBase ? "Base" : "Celo";
+      const replyText = `Balances on ${networkName} for ${walletAddress}:
+- ${nativeSymbol}: ${formatEther(nativeBalance)}
 - USDC: ${formatUnits(usdcBalance as bigint, 6)}
-- USDm: ${formatUnits(usdmBalance as bigint, 18)}`;
+- ${stableSymbol}: ${formatUnits(stableBalance as bigint, isBase ? 6 : 18)}`;
 
       if (callback) {
         callback({ text: replyText });

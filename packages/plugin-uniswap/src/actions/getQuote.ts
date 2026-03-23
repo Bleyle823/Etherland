@@ -23,14 +23,17 @@ const getQuoteSchema = z.object({
 });
 
 const extractionTemplate = `
-Extract swap parameters from the message.
+Extract swap parameters from the message. 
+If the user specifies a network (e.g. "on Base"), use that chain ID (Base=8453, Celo=42220, Ethereum=1).
+If no chain is specified, default to Base (8453).
+
 Return only a JSON object with the following properties:
 - swapper (0x...)
-- tokenIn (0x...)
-- tokenOut (0x...)
+- tokenIn (0x... or symbol like "ETH", "USDC", "cUSD")
+- tokenOut (0x... or symbol like "ETH", "USDC", "cUSD")
 - tokenInChainId (number)
 - tokenOutChainId (number)
-- amount (integer string)
+- amount (string, use the human-readable amount like "0.001")
 - type (EXACT_INPUT or EXACT_OUTPUT)
 
 Message: {{message.content.text}}
@@ -76,6 +79,66 @@ export const getQuoteAction: Action = {
           logger.info({ src: 'plugin-uniswap', swapper: params.swapper }, 'Using agent EVM_WALLET_ADDRESS from env');
         }
       }
+
+      // Symbol to Address Map (for common tokens)
+      const tokenMap: Record<number, Record<string, string>> = {
+        8453: { // Base
+          "ETH": "0x4200000000000000000000000000000000000006", // WETH
+          "WETH": "0x4200000000000000000000000000000000000006",
+          "USDC": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+        },
+        1: { // Ethereum
+          "ETH": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH
+          "WETH": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "USDC": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        },
+        42220: { // Celo
+          "CELO": "0x471EcE3750Da237f93B8E2997353916a4b1703d2",
+          "cUSD": "0x765DE816845861e75A25fCA122bb6898B8B1282a",
+          "USDC": "0xcebA9300f2b948710d2653dD7B07f33A8B32118C",
+        }
+      };
+
+      const decimalMap: Record<string, number> = {
+        "0x4200000000000000000000000000000000000006": 18, // Base WETH
+        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913": 6,  // Base USDC
+        "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2": 18, // Mainnet WETH
+        "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": 6,  // Mainnet USDC
+        "0x471EcE3750Da237f93B8E2997353916a4b1703d2": 18, // Celo CELO
+        "0x765DE816845861e75A25fCA122bb6898B8B1282a": 18, // Celo cUSD
+        "0xcebA9300f2b948710d2653dD7B07f33A8B32118C": 6,  // Celo USDC
+      };
+
+      // Resolve tokenIn
+      if (!isAddress(params.tokenIn as string)) {
+        const symbol = (params.tokenIn as string).toUpperCase();
+        const address = tokenMap[params.tokenInChainId]?.[symbol];
+        if (address) {
+          params.tokenIn = address;
+        } else {
+          throw new Error(`Could not resolve tokenIn symbol: ${params.tokenIn} on chain ${params.tokenInChainId}`);
+        }
+      }
+
+      // Resolve tokenOut
+      if (!isAddress(params.tokenOut as string)) {
+        const symbol = (params.tokenOut as string).toUpperCase();
+        const address = tokenMap[params.tokenOutChainId]?.[symbol];
+        if (address) {
+          params.tokenOut = address;
+        } else {
+          throw new Error(`Could not resolve tokenOut symbol: ${params.tokenOut} on chain ${params.tokenOutChainId}`);
+        }
+      }
+
+      // Convert amount to base units
+      if (params.amount && (params.amount.includes('.') || parseFloat(params.amount) < 100)) {
+        const decimals = decimalMap[params.tokenIn.toLowerCase()] || 18; // Default to 18
+        const floatAmount = parseFloat(params.amount);
+        const { parseUnits } = await import("viem");
+        params.amount = parseUnits(floatAmount.toString(), decimals).toString();
+        logger.info({ src: 'plugin-uniswap', amount: params.amount }, 'Converted human amount to base units');
+      }
       const apiKey = runtime.getSetting('UNISWAP_API_KEY') || process.env.UNISWAP_API_KEY;
 
       if (!apiKey) throw new Error('UNISWAP_API_KEY is not configured');
@@ -91,6 +154,10 @@ export const getQuoteAction: Action = {
       });
 
       const data = await response.json();
+      
+      if (!response.ok || data.detail) {
+        throw new Error(`API Error: ${JSON.stringify(data)}`);
+      }
       
       const routing = data.routing;
       let replyText = `Retrieved quote using ${routing} routing.`;

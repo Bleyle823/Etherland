@@ -7,6 +7,7 @@ import {
   logger,
 } from '@elizaos/core';
 import { isAddress, isHex } from 'viem';
+import { getQuoteAction } from './getQuote';
 
 export const executeSwapAction: Action = {
   name: 'EXECUTE_SWAP',
@@ -32,7 +33,6 @@ export const executeSwapAction: Action = {
       if (!quoteResponse) {
         // Automatically fetch quote if not found in state
         try {
-          const { getQuoteAction } = await import('./getQuote.ts');
           const quoteResult = await getQuoteAction.handler(runtime, message, state, _options, undefined);
           
           if (!quoteResult || !quoteResult.success) {
@@ -64,8 +64,8 @@ export const executeSwapAction: Action = {
 
       // 1. Prepare the swap request body
       // We must spread the quote response and handle permitData correctly by routing type
-      const { permitData, permitTransaction, ...cleanQuote } = quoteResponse;
-      const swapRequest: Record<string, any> = { ...cleanQuote };
+      const { permitData, permitTransaction, quote } = quoteResponse;
+      const swapRequest: Record<string, any> = { quote };
 
       const isUniswapX =
         quoteResponse.routing === 'DUTCH_V2' ||
@@ -101,7 +101,7 @@ export const executeSwapAction: Action = {
       const swapData = await response.json();
 
       if (!swapData.swap) {
-        throw new Error('Failed to generate swap transaction. Quote might have expired.');
+        throw new Error(`Failed to generate swap transaction. Response: ${JSON.stringify(swapData)}`);
       }
 
       // 3. Validate the transaction

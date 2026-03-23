@@ -10,6 +10,9 @@
     "@elizaos/plugin-evm"
   ],
   "settings": {
+    "chains": {
+      "evm": ["mainnet", "base", "celo"]
+    },
     "secrets": {},
     "voice": {
       "model": "en_US-male-medium"

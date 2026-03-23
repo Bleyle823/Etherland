@@ -1,223 +1,117 @@
 <div align="center">
-  <h1>ElizaOS</h1>
-  <p><strong>The Open-Source Framework for Multi-Agent AI Development</strong></p>
-  <p>Build, deploy, and manage autonomous AI agents with a modern, extensible, and full-featured platform.</p>
+  <img src="https://raw.githubusercontent.com/elizaos/eliza/main/docs/static/img/eliza-icon.png" width="120" height="120" alt="Etherland Trader Logo">
+  <h1>🌍 Etherland Trader</h1>
+  <p><strong>Autonomous DeFi Desk Trader for Cross-Chain Capital Optimization</strong></p>
+  <p><i>A Submission for the Synthesis Hackathon</i></p>
 </div>
-
-<div align="center">
-  <!-- Badges will go here -->
-  <a href="https://github.com/elizaos/eliza/blob/main/LICENSE"><img src="https://img.shields.io/github/license/elizaos/eliza?style=for-the-badge" alt="License"></a>
-  <a href="https://www.npmjs.com/package/@elizaos/cli"><img src="https://img.shields.io/npm/v/@elizaos/cli?style=for-the-badge" alt="NPM Version"></a>
-  <a href="https://docs.elizaos.ai/"><img src="https://img.shields.io/badge/Documentation-Read%20Docs-blue?style=for-the-badge" alt="Documentation"></a>
-  <a href="https://deepwiki.com/elizaOS/eliza"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki" height="28"></a>
-  <a href="https://github.com/elizaos/eliza/actions/workflows/image.yaml"><img src="https://img.shields.io/github/actions/workflow/status/elizaos/eliza/ci.yaml?branch=main&style=for-the-badge" alt="CI Status"></a>
-  <a href="https://discord.gg/ai16z"><img src="https://img.shields.io/discord/1253563208833433701?style=for-the-badge&logo=discord" alt="Discord"></a>
-</div>
-
-## ✨ What is Eliza?
-
-`bun packages/cli/dist/index.js start --character=characters/trader.character.json`
-
-ElizaOS is an all-in-one, extensible platform for building and deploying AI-powered applications. Whether you're creating sophisticated chatbots, autonomous agents for business process automation, or intelligent game NPCs, Eliza provides the tools you need to get started quickly and scale effectively.
-
-It combines a modular architecture, a powerful CLI, and a rich web interface to give you full control over your agents' development, deployment, and management lifecycle.
-
-For complete guides and API references, visit our official **[documentation](https://docs.elizaos.ai/)**.
-
-## 🚀 Key Features
-
-- 🔌 **Rich Connectivity**: Out-of-the-box connectors for Discord, Telegram, Farcaster, and more.
-- 🧠 **Model Agnostic**: Supports all major models, including OpenAI, Gemini, Anthropic, Llama, and Grok.
-- 🖥️ **Modern Web UI**: A professional dashboard for managing agents, groups, and conversations in real-time.
-- 🤖 **Multi-Agent Architecture**: Designed from the ground up for creating and orchestrating groups of specialized agents.
-- 📄 **Document Ingestion**: Easily ingest documents and allow agents to retrieve information and answer questions from your data (RAG).
-- 🛠️ **Highly Extensible**: Build your own functionality with a powerful plugin system.
-- 📦 **It Just Works**: A seamless setup and development experience from day one.
-
-## 🏁 Getting Started (5-Minute Quick Start)
-
-There are two recommended paths for using Eliza:
-
-- **For Beginners & Standalone Projects (CLI):** If you want to create and deploy agents without modifying Eliza's core code, the CLI is the fastest and simplest method. The guide below is for you.
-
-- **For Power Users & Contributors (Monorepo):** If you plan to contribute to Eliza, create complex custom plugins, or manage multiple projects in one place, we recommend cloning the full monorepo. See the [How to Contribute](#-how-to-contribute) section to get started.
 
 ---
 
-Get your first AI agent running in just a few commands.
+## 🚀 Overview
 
-**Prerequisites:**
+**Etherland Trader** is a seasoned AI desk trader built on ElizaOS, designed to manage capital with institutional precision across **Base** and **Celo** networks. It prioritizes capital efficiency, safety, and stablecoin-first thinking.
+
+The agent acts as a professional bridge between the liquidity of Base and the mobile-first accessibility of Celo, leveraging state-of-the-art DeFi protocols to execute swaps, track balances, and manage on-chain identity via ENS.
+
+## ✨ Key Features
+
+- 🦄 **High-Precision Uniswap Trading**: Integrated with the **Uniswap Trading API** (v1) for optimized swap routing.
+  - Automatic conversion from human units (e.g., "0.001 ETH") to base units (wei).
+  - Built-in symbol resolution for ETH, USDC, CELO, and cUSD on supported chains.
+- 🌉 **Cross-Chain Routing**: Specialized in capital movement between **Base** and **Celo**.
+- 📊 **Multi-Chain Balance Tracking**: Custom `plugin-celo` and `plugin-evm` integration for real-time tracking of native and stablecoin assets.
+- 🆔 **ENS Identity Management**: Full support for resolving `.eth` names and reverse-resolving addresses to ensure secure transactions.
+- 🏦 **Stablecoin Prioritization**: Thinks and operates in USDC and cUSD to minimize volatility markers.
+
+## 🏆 Synthesis Hackathon Submission
+
+This project is registered for the **Synthesis Hackathon**. 
+
+- **Agent Name**: Etherland Trader
+- **Primary Goal**: Showcase autonomous capital management and cross-chain execution using the ElizaOS framework.
+- **Synthesis API Integration**: Leverages the Synthesis platform for agent identity and hackathon verification.
+
+---
+
+## 🛠️ Getting Started
+
+### Prerequisites
 
 - [Node.js](https://nodejs.org/) (v23+)
-- [bun](https://bun.sh/docs/installation)
+- [bun](https://bun.sh/)
+- **Uniswap API Key**: Required for the `plugin-uniswap` to fetch quotes.
+- **EVM Private Key**: For transaction signing and execution.
 
-> **Note for Windows Users:** [WSL 2](https://learn.microsoft.com/en-us/windows/wsl/install-manual) is required.
-
-### 1. Install the CLI
-
-```bash
-# Install the ElizaOS CLI globally
-bun install -g @elizaos/cli
-
-# Verify installation
-elizaos --version
-```
-
-### 2. Create Your Project
+### Installation
 
 ```bash
-# Create a new project with an interactive setup
-elizaos create my-first-agent
+# Clone the repository
+git clone https://github.com/Bleyle823/Etherland2.git
+cd Etherland2/eliza-main
 
-# Follow the prompts. For beginners, we recommend:
-# - Database: pglite (no setup required)
-# - Model Provider: openai
-# - Project Type: project
-```
+# Install dependencies
+bun install
 
-### 3. Configure Your API Key
-
-```bash
-cd my-first-agent
-
-# Open the local environment file
-elizaos env edit-local
-```
-
-Add your model provider's API key (e.g., for OpenAI):
-
-```env
-OPENAI_API_KEY=your_api_key_here
-```
-
-### 4. Start Your Agent
-
-```bash
-# Build and start the agent server
-elizaos start
-```
-
-Your agent is now running!
-
-- **Web Interface**: [http://localhost:3000](http://localhost:3000)
-- **API Endpoint**: `http://localhost:3000/api`
-
----
-
-<details>
-<summary>📚 **Advanced CLI Commands & Usage**</summary>
-
-Eliza's CLI is powerful. Here are some more commands for development and management.
-
-#### Development Workflow
-
-```bash
-# Make changes to your agent code, then rebuild and restart
+# Build the custom plugins
 bun run build
-elizaos start
-
-# Or, start in development mode with auto-rebuild
-elizaos dev
-
-# Run tests to verify your changes
-elizaos test
 ```
 
-#### Agent & Environment Management
+### Configuration
+
+Copy the example environment file and fill in your credentials:
 
 ```bash
-# List all available agents
-elizaos agent list
-
-# Start a specific agent by name
-elizaos agent start --name "MyAgent"
-
-# Show all environment variables
-elizaos env list
+cp .env.example .env
 ```
 
-#### Debugging
+Key variables:
+- `EVM_PRIVATE_KEY`: Your wallet's private key.
+- `UNISWAP_API_KEY`: Your Uniswap Trading API key.
+- `SYNTHESIS_API_KEY`: Your Synthesis Hackathon API key.
+- `ANTHROPIC_API_KEY`: For the Claude 3.5 Sonnet / Haiku brain.
+
+### Running the Trader
+
+Start the Etherland Trader character:
 
 ```bash
-# Start with detailed debug logging
-LOG_LEVEL=debug elizaos start
+bun packages/cli/dist/index.js start --character=characters/trader.character.json
 ```
-
-For a full command reference, run `elizaos --help` or `elizaos <command> --help`.
-
-</details>
 
 ---
 
-## 🔧 Running ElizaOS Core Standalone
+## 🔌 Custom Plugins & Developer Impact
 
-Use ElizaOS agents directly in your applications without the CLI or web interface.
+These plugins are fully functional and designed to be open-source contributions. They will directly assist developers building with these respective tools in the future by providing seamless, out-of-the-box integrations for the ElizaOS ecosystem.
 
-```bash
-git clone https://github.com/elizaos/eliza.git
-cd eliza/examples
+### 1. `plugin-uniswap`
+**Why it's needed:** Currently, there is no dedicated, fully-featured Eliza plugin for Uniswap. 
+**Benefit to the Protocol:** This plugin resolves that gap by wrapping the Uniswap Trading API into the AI agent ecosystem. It autonomously handles token resolution, `GET_QUOTE` fetching across Uniswap v2/v3/UniswapX, and safe `EXECUTE_SWAP` generation via Viem. By providing this missing infrastructure, it empowers future AI developers to build trading bots, yield optimizers, and automated portfolios natively on Uniswap, driving autonomous trade volume and deep integration into the protocol.
 
-# Interactive chat
-OPENAI_API_KEY=your_key bun run standalone-cli-chat.ts
+### 2. `plugin-ens`
+**Why it's needed:** AI agents and users alike struggle with raw 42-character hex addresses, leading to unreadable logs and error-prone transfers.
+**Benefit to the Protocol:** This functional plugin integrates the Ethereum Name Service directly into the agent's cognition, allowing it to natively resolve `.eth` names and perform reverse lookups. This makes agent operations human-readable and secure. For the ENS protocol, this standardizes ENS as the foundational identity layer for the growing machine-to-machine and machine-to-human autonomous economy.
 
-# Basic message processing
-OPENAI_API_KEY=your_key bun run standalone.ts
-```
+### 3. `plugin-celo`
+**Why it's needed:** Celo's unique mobile-first, stablecoin-centric architecture (like fee abstraction) requires tailored agentic tools that generalized EVM plugins often miss.
+**Benefit to the Protocol:** This plugin provides essential Celo-specific actions, including specialized multi-token balance reading (CELO, cUSD), Aave lending/borrowing integration, and ERC20 gas payment abstractions. By simplifying these Celo-native features into simple natural language commands, it reduces friction for future builders, positioning Celo as a premier network for AI agents and driving automated DeFi activity onto the chain.
 
-## 🏛️ Architecture Overview
+---
 
-Eliza is a monorepo that contains all the packages needed to run the entire platform.
+## 🤝 Architecture
 
-```
-/
-├── packages/
-│   ├── server/         # Core backend server (Express.js)
-│   ├── client/         # Frontend web interface (React)
-│   ├── cli/            # Command-line tool for managing projects
-│   ├── core/           # Shared utilities and functions
-│   ├── app/            # Cross-platform desktop app (Tauri)
-│   ├── plugin-bootstrap/ # Core communication and event handling plugin
-│   ├── plugin-sql/     # Database integration (Postgres, PGLite)
-│   └── ...             # Other plugins and project starters
-└── ...
-```
-
-- **`@elizaos/server`**: The Express.js backend that runs your agents and exposes the API.
-- **`@elizaos/client`**: The React-based web UI for managing and interacting with your agents.
-- **`@elizaos/cli`**: The central tool for scaffolding, running, and managing your projects.
-- **`@elizaos/plugin-bootstrap`**: The mandatory core plugin that handles message processing and basic agent actions.
-
-## 🤝 How to Contribute
-
-We welcome contributions from the community! Please read our `CONTRIBUTING.md` guide to get started.
-
-- **Report a Bug**: Open an issue using the [Bug Report](.github/ISSUE_TEMPLATE/bug_report.md) template.
-- **Request a Feature**: Use the [Feature Request](.github/ISSUE_TEMPLATE/feature_request.md) template.
-- **Submit a Pull Request**: Please open an issue first to discuss your proposed changes.
+Etherland Trader leverages a modular architecture:
+- **Core**: ElizaOS Framework.
+- **Logic**: Custom actions for trading and capital routing.
+- **Identity**: ENS and Synthesis API.
+- **Provider**: Real-time balance and gas tracking via Viem.
 
 ## 📜 License
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
-## 🎓 Citation
+---
 
-If you use Eliza in your research, please cite our paper:
-
-```bibtex
-@article{walters2025eliza,
-  title={Eliza: A Web3 friendly AI Agent Operating System},
-  author={Walters, Shaw and Gao, Sam and Nerd, Shakker and Da, Feng and Williams, Warren and Meng, Ting-Chien and Han, Hunter and He, Frank and Zhang, Allen and Wu, Ming and others},
-  journal={arXiv preprint arXiv:2501.06781},
-  year={2025}
-}
-```
-
-## Contributors
-
-<a href="https://github.com/elizaos/eliza/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=elizaos/eliza" alt="Eliza project contributors" />
-</a>
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=elizaos/eliza&type=Date)](https://star-history.com/#elizaos/eliza&Date)
+<div align="center">
+  <p>Built with ❤️ for the Synthesis Hackathon by early adopters of ElizaOS.</p>
+</div>
