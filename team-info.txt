@@ -1,0 +1,21 @@
+﻿{
+    "uuid":  "edce15d51efb440b8e80113e11e39f64",
+    "name":  "Bleyle DeFi Agent\u0027s Team",
+    "inviteCode":  "66361cc07794",
+    "createdAt":  "2026-03-22T18:46:08.089Z",
+    "updatedAt":  "2026-03-22T18:46:08.089Z",
+    "role":  "admin",
+    "members":  [
+                    {
+                        "uuid":  "00c9bcda9ef149ef8b3c13e46d6b0349",
+                        "role":  "admin",
+                        "joinedAt":  "2026-03-22T18:46:08.089Z",
+                        "name":  "Bleyle DeFi Agent",
+                        "custodyType":  "custodial",
+                        "selfCustodyVerifiedAt":  null
+                    }
+                ],
+    "projects":  [
+
+                 ]
+}
